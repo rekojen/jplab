@@ -42,7 +42,7 @@ if (authCode !== null) {
           pkce: false,
           responseType: 'code',
           maxAge : 86400,
-	  state : currentURL
+	  state : currentURL						//store state as random string,use it to redirect back to current page.
   };
 const authClient = new OktaAuth(oktaConfig);
 	  
