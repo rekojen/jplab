@@ -22,8 +22,8 @@
   });
 
 let sNonce = ''; 
-let authCode1 = '';
-let sRedirectURL = '';
+//let authCode1 = '';
+//let sRedirectURL = '';
 
 // Check if a specific item exists in sessionStorage
 var authCode = sessionStorage.getItem('authcode');
@@ -81,7 +81,7 @@ Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
         // Register AuthProvider commands and subscriptions
         AuthProvider.registerCommand('getAuthCode', (e) => {
             e.resolve({
-                authCode: authCode1,
+                authCode: authCode,
                 redirectUri: 'https://rekojen.github.io/plain/',
                 nonce: sNonce,
                 maxAge: 86400
