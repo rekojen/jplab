@@ -30,6 +30,18 @@ var authCode = sessionStorage.getItem(currentURL);         	// Get the authoriza
 // Check if a authCode exists in sessionStorage, if exist, meaning it is authenticated and came back from Okta redirectURI.
 if (authCode !== null) {
     console.log('authCode: ' + authCode);
+    let sOktaTransactionStorage = window.sessionStorage.getItem('okta-transaction-storage');
+    if (sOktaTransactionStorage) {
+        try {
+              const oStorage = JSON.parse(sOktaTransactionStorage);
+              if (oStorage && oStorage.nonce) {
+                    sNonce = oStorage.nonce || '';
+                    console.log('nonce: ' + sNonce);
+                }
+            } catch (error) {
+                console.error('Error parsing sessionStorage:', error);
+            }
+        }
 } else {
     console.log('authCode: ' + 'not exist');
 }
@@ -47,7 +59,6 @@ if (authCode == null) {
         state: 'your-state',
         redirectUri: redirectUri,
     };
-
     // Initialize the Okta auth client with the config options
     const authClient = new OktaAuth(oktaConfig);
 
@@ -57,22 +68,8 @@ if (authCode == null) {
         ...oktaConfig
     });
 } else {
-    // The authCode exists, indicating that the user has returned from the redirect
+    // The authCode exists, indicating that the user has returned from the redirect page
     Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
-        // Retrieve and set nonce from session storage if available
-        let sOktaTransactionStorage = window.sessionStorage.getItem('okta-transaction-storage');
-        if (sOktaTransactionStorage) {
-            try {
-                const oStorage = JSON.parse(sOktaTransactionStorage);
-                if (oStorage && oStorage.nonce) {
-                    sNonce = oStorage.nonce || '';
-                    console.log('nonce: ' + sNonce);
-                }
-            } catch (error) {
-                console.error('Error parsing sessionStorage:', error);
-            }
-        }
-
         // Register AuthProvider commands and subscriptions
         AuthProvider.registerCommand('getAuthCode', (e) => {
             e.resolve({
@@ -111,8 +108,7 @@ if (authCode == null) {
                 .finally(() => {
                     if (authClient) authClient.signOut();
                 });
-        });
-
+        };
         AuthProvider.ready();
     });
 }
