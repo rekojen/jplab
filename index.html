@@ -24,25 +24,14 @@
 let sNonce = ''; 
 let authCode1 = '';
 let sRedirectURL = '';
-const currentURL = window.location.href;
-// Check if a specific item exists in sessionStorage
-var authexist = sessionStorage.getItem('authcode');
 
-if (authexist == null) {
-    sRedirectURL = window.location.href;
+// Check if a specific item exists in sessionStorage
+var authCode = sessionStorage.getItem('authcode');
+
+if (authCode !== null) {
+    console.log('authCodefromjplab: ' + authCode);
 } else {
-    // Retrieve and set redirectURI from session storage if available
-    let sOktaTransactionStorage = window.sessionStorage.getItem("okta-transaction-storage");
-    if (sOktaTransactionStorage) {
-        try {
-            const oStorage1 = JSON.parse(sOktaTransactionStorage);
-            if (oStorage1 && oStorage1.redirectUri) {
-                sRedirectURL = oStorage1.redirectUri || '';
-            }
-        } catch (error) {
-            console.error("Error parsing sessionStorage:", error);
-        }
-    }
+    console.log('authCodefromjplab: ' + 'not exist');
 }
 console.log('sRedirectURL: ' + sRedirectURL);
 
@@ -61,7 +50,7 @@ const authClient = new OktaAuth(oktaConfig);
 	  
 // Initialize the Okta auth client with the config options
 Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
-    if (authexist == null) {
+    if (authCode == null) {
         authClient.signInWithRedirect({
             originalUri: 'https://rekojen.github.io/plain/',
             ...oktaConfig
@@ -86,8 +75,8 @@ Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
 
 //        const urlParams = new URLSearchParams(window.location.search);
 //        authCode1 = urlParams.has('code') ? urlParams.get('code') : '';
-	var authCode1 = sessionStorage.getItem('authCode');
-        console.log('authcode: ' + authCode1);
+//	var authCode1 = sessionStorage.getItem('authCode');
+//        console.log('authcode: ' + authCode1);
 
         // Register AuthProvider commands and subscriptions
         AuthProvider.registerCommand('getAuthCode', (e) => {
