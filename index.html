@@ -90,7 +90,7 @@ Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
         AuthProvider.registerCommand('getAuthCode', (e) => {
             e.resolve({
                 authCode: authCode1,
-                redirectUri: sRedirectURL,
+                redirectUri: 'https://rekojen.github.io/plain/',
                 nonce: sNonce,
                 maxAge: 86400
             });
