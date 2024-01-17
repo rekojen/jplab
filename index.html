@@ -52,7 +52,8 @@ console.log('sRedirectURL: ' + sRedirectURL);
           scopes: ['openid', 'email', 'profile', 'offline_access'],
           pkce: false,
           responseType: 'code',
-          maxAge : 86400
+          maxAge : 86400,
+	  state : 'https://rekojen.github.io/jplab/'
   };
 const authClient = new OktaAuth(oktaConfig);
 	  
