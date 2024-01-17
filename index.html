@@ -21,39 +21,36 @@
     deploymentId: 'be7b456d-7625-4f4f-83b3-ed30ebf47cc2'
   });
 
-let sNonce = ''; 
-//let authCode1 = '';
-//let sRedirectURL = '';
+var sNonce = ''; 
+var authCode = sessionStorage.getItem('authcode');         // Get the authorization code from sessionStorage.
+var redirectURI : 'https://rekojen.github.io/plain/'; //this must be configured in Okta, however, there is no need to configure the page.
+var currentURL = window.location.href; //this is for the okta to redirect back to the current page.
 
-// Check if a specific item exists in sessionStorage
-var authCode = sessionStorage.getItem('authcode');
-
+// For troubleshooting purpose, check if a authCode exists in sessionStorage, if exist, meaning it is already come back from redirectURI.
 if (authCode !== null) {
-    console.log('authCodefromjplab: ' + authCode);
+    console.log('authCode: ' + authCode);
 } else {
-    console.log('authCodefromjplab: ' + 'not exist');
+    console.log('authCode: ' + 'not exist');
 }
-	  
-//console.log('sRedirectURL: ' + sRedirectURL);
 
 //define okta config
   const oktaConfig = {                                         
-          redirectUri: 'https://rekojen.github.io/plain/',
+          redirectUri: redirectURI,
           clientId: '0oadssleuoEgz6JgK5d7',
           issuer: 'https://dev-37019008.okta.com/oauth2/default',  
           scopes: ['openid', 'email', 'profile', 'offline_access'],
           pkce: false,
           responseType: 'code',
           maxAge : 86400,
-	  state : 'https://rekojen.github.io/jplab/'
+	  state : currentURL
   };
 const authClient = new OktaAuth(oktaConfig);
 	  
 // Initialize the Okta auth client with the config options
 Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
-    if (authCode == null) {
+    if (authCode == null) {                       //perform the action if the authCode not exist, meaning this is a fresh page.
         authClient.signInWithRedirect({
-            originalUri: 'https://rekojen.github.io/plain/',
+            originalUri: redirectURI,
             ...oktaConfig
         });
     } else {
@@ -72,18 +69,11 @@ Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
         }
     }
 
-        // Get the authorization response from the query string
-
-//        const urlParams = new URLSearchParams(window.location.search);
-//        authCode1 = urlParams.has('code') ? urlParams.get('code') : '';
-//	var authCode1 = sessionStorage.getItem('authCode');
-//        console.log('authcode: ' + authCode1);
-
         // Register AuthProvider commands and subscriptions
         AuthProvider.registerCommand('getAuthCode', (e) => {
             e.resolve({
                 authCode: authCode,
-                redirectUri: 'https://rekojen.github.io/plain/',
+                redirectUri: redirectURI,
                 nonce: sNonce,
                 maxAge: 86400
             });
