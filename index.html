@@ -46,8 +46,7 @@ console.log('sRedirectURL: ' + sRedirectURL);
 
 //define okta config
   const oktaConfig = {                                         
-          redirectUri: sRedirectURL,
-          postLogoutRedirectUri: sRedirectURL,
+          redirectUri: 'https://rekojen.github.io/plain/',
           clientId: '0oadssleuoEgz6JgK5d7',
           issuer: 'https://dev-37019008.okta.com/oauth2/default',  
           scopes: ['openid', 'email', 'profile', 'offline_access'],
