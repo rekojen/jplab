@@ -81,6 +81,7 @@ Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
     }
 
         // Get the authorization response from the query string
+	console.log('windowURL: ' + window.location.href);
         const urlParams = new URLSearchParams(window.location.search);
         authCode1 = urlParams.has('code') ? urlParams.get('code') : '';
         console.log('authcode: ' + authCode1);
