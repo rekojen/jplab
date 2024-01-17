@@ -22,9 +22,9 @@
   });
 
 var sNonce = ''; 
-var authCode = sessionStorage.getItem('authcode');         // Get the authorization code from sessionStorage.
 var redirectURI = 'https://rekojen.github.io/plain/'; //this must be configured in Okta, this is the page that used for authenticated
 var currentURL = window.location.href; //this is for the okta to redirect back to the current page.
+var authCode = sessionStorage.getItem(currentURL);         // Get the authorization code from sessionStorage.
 
 // For troubleshooting purpose, check if a authCode exists in sessionStorage, if exist, meaning it is already come back from redirectURI.
 if (authCode !== null) {
