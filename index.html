@@ -25,8 +25,10 @@ let sNonce = '';
 let authCode1 = '';
 let sRedirectURL = '';
 const currentURL = window.location.href;
+// Check if a specific item exists in sessionStorage
+var authexist = sessionStorage.getItem('authcode');
 
-if (currentURL.indexOf('code') <= -1) {
+if (authexist == null) {
     sRedirectURL = window.location.href;
 } else {
     // Retrieve and set redirectURI from session storage if available
@@ -59,7 +61,7 @@ const authClient = new OktaAuth(oktaConfig);
 	  
 // Initialize the Okta auth client with the config options
 Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
-    if (currentURL.indexOf('code') <= -1) {
+    if (authexist == null) {
         authClient.signInWithRedirect({
             originalUri: 'https://rekojen.github.io/plain/',
             ...oktaConfig
@@ -81,9 +83,10 @@ Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
     }
 
         // Get the authorization response from the query string
-	console.log('windowURL: ' + window.location.href);
-        const urlParams = new URLSearchParams(window.location.search);
-        authCode1 = urlParams.has('code') ? urlParams.get('code') : '';
+
+//        const urlParams = new URLSearchParams(window.location.search);
+//        authCode1 = urlParams.has('code') ? urlParams.get('code') : '';
+	var authCode1 = sessionStorage.getItem('authCode');
         console.log('authcode: ' + authCode1);
 
         // Register AuthProvider commands and subscriptions
