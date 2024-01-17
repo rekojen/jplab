@@ -61,7 +61,7 @@ const authClient = new OktaAuth(oktaConfig);
 Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
     if (currentURL.indexOf('code') <= -1) {
         authClient.signInWithRedirect({
-            originalUri: 'https://rekojen.github.io/jplab/',
+            originalUri: 'https://rekojen.github.io/plain/',
             ...oktaConfig
         });
     } else {
