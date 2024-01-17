@@ -27,27 +27,10 @@ var redirectURI = 'https://rekojen.github.io/plain/'; 		//this must configured i
 var currentURL = window.location.href; 				//this is for the okta to redirect back to the current page.
 var authCode = sessionStorage.getItem(currentURL);         	// Get the authorization code from sessionStorage.
 
-// Check if a authCode exists in sessionStorage, if exist, meaning it is authenticated and came back from Okta redirectURI.
-if (authCode !== null) {
-    console.log('authCode: ' + authCode);
-    let sOktaTransactionStorage = window.sessionStorage.getItem('okta-transaction-storage');
-    if (sOktaTransactionStorage) {
-        try {
-              const oStorage = JSON.parse(sOktaTransactionStorage);
-              if (oStorage && oStorage.nonce) {
-                    sNonce = oStorage.nonce || '';
-                    console.log('nonce: ' + sNonce);
-                }
-            } catch (error) {
-                console.error('Error parsing sessionStorage:', error);
-            }
-        }
-} else {
-    console.log('authCode: ' + 'not exist');
-}
 
 // Perform the action if the authCode does not exist, meaning this is unauthenticated.
 if (authCode == null) {
+    console.log('authCode: ' + 'not exist');
     const oktaConfig = {
         // Replace these with your actual Okta configuration settings
         clientId: '0oadssleuoEgz6JgK5d7',
@@ -68,7 +51,21 @@ if (authCode == null) {
         ...oktaConfig
     });
 } else {
-    // The authCode exists, indicating that the user has returned from the redirect page
+ // The authCode exists, indicating that the user has returned from the redirect page and authenticated thus ready to registery to Genesys.
+    console.log('authCode: ' + authCode);
+    let sOktaTransactionStorage = window.sessionStorage.getItem('okta-transaction-storage');
+    if (sOktaTransactionStorage) {
+        try {
+              const oStorage = JSON.parse(sOktaTransactionStorage);
+              if (oStorage && oStorage.nonce) {
+                    sNonce = oStorage.nonce || '';
+                    console.log('nonce: ' + sNonce);
+                }
+            } catch (error) {
+                console.error('Error parsing sessionStorage:', error);
+            }
+        }
+    
     Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
         // Register AuthProvider commands and subscriptions
         AuthProvider.registerCommand('getAuthCode', (e) => {
