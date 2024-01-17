@@ -18,7 +18,8 @@
     ys = document.createElement('script'); ys.async = 1; ys.src = n; ys.charset = 'utf-8'; document.head.appendChild(ys);
   })(window, 'Genesys', 'https://apps.mypurecloud.jp/genesys-bootstrap/genesys.min.js', {
     environment: 'prod-apne1',
-    deploymentId: 'be7b456d-7625-4f4f-83b3-ed30ebf47cc2'
+    deploymentId: 'be7b456d-7625-4f4f-83b3-ed30ebf47cc2',
+    debug: true
   });
 
 var sNonce = ''; 
@@ -85,7 +86,6 @@ Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
         });
 
         AuthProvider.subscribe('Auth.authenticated', (res) => {
-            const { message } = error.data || {};
             console.log('Log authenticated');
             console.log(res);
         });
@@ -95,7 +95,7 @@ Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
 	});
 	
 	AuthProvider.subscribe('Auth.error', (error) => {
-		console.log("Auth Error", message);
+		console.log("Auth Error", error);
 		});
 
 	AuthProvider.subscribe('Auth.authError', (error) => {
