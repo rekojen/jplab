@@ -51,13 +51,13 @@ if (authCode == null) {
     const oktaConfig = {
         // Replace these with your actual Okta configuration settings
         clientId: '0oadssleuoEgz6JgK5d7',
+        redirectUri: redirectURI,
         issuer: 'https://dev-37019008.okta.com/oauth2/default',
         scopes: ['openid', 'email', 'profile', 'offline_access'],
         pkce: false,
         responseType: 'code',
         maxAge: 86400,
-        state: 'your-state',
-        redirectUri: redirectURI,
+        state: currentURL
     };
     // Initialize the Okta auth client with the config options
     const authClient = new OktaAuth(oktaConfig);
