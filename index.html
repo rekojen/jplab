@@ -23,40 +23,44 @@
   });
 
 var sNonce = ''; 
-var redirectURI = 'https://rekojen.github.io/plain/'; //this must be configured in Okta, this is the page that used for authenticated
-var currentURL = window.location.href; //this is for the okta to redirect back to the current page.
-var authCode = sessionStorage.getItem(currentURL);         // Get the authorization code from sessionStorage.
+var redirectURI = 'https://rekojen.github.io/plain/'; 		//this must be configured in Okta, this is the page that used for authenticated
+var currentURL = window.location.href; 				//this is for the okta to redirect back to the current page.
+var authCode = sessionStorage.getItem(currentURL);         	// Get the authorization code from sessionStorage.
 
-// For troubleshooting purpose, check if a authCode exists in sessionStorage, if exist, meaning it is already come back from redirectURI.
+// Check if a authCode exists in sessionStorage, if exist, meaning it is authenticated and came back from Okta redirectURI.
 if (authCode !== null) {
     console.log('authCode: ' + authCode);
 } else {
     console.log('authCode: ' + 'not exist');
 }
 
-//define okta config
-  const oktaConfig = {                                         
-          redirectUri: redirectURI,
-          clientId: '0oadssleuoEgz6JgK5d7',
-          issuer: 'https://dev-37019008.okta.com/oauth2/default',  
-          scopes: ['openid', 'email', 'profile', 'offline_access'],
-          pkce: false,
-          responseType: 'code',
-          maxAge : 86400,
-	  state : currentURL						//store state as random string,use it to redirect back to current page.
-  };
-const authClient = new OktaAuth(oktaConfig);
-	  
-// Initialize the Okta auth client with the config options
-Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
-    if (authCode == null) {                       //perform the action if the authCode not exist, meaning this is a fresh page.
-        authClient.signInWithRedirect({
-            originalUri: redirectURI,
-            ...oktaConfig
-        });
-    } else {
-	// Retrieve and set nonce from session storage if available
-        let sOktaTransactionStorage = window.sessionStorage.getItem("okta-transaction-storage");
+// Perform the action if the authCode does not exist, meaning this is unauthenticated.
+if (authCode == null) {
+    const oktaConfig = {
+        // Replace these with your actual Okta configuration settings
+        clientId: '0oadssleuoEgz6JgK5d7',
+        issuer: 'https://dev-37019008.okta.com/oauth2/default',
+        scopes: ['openid', 'email', 'profile', 'offline_access'],
+        pkce: false,
+        responseType: 'code',
+        maxAge: 86400,
+        state: 'your-state',
+        redirectUri: redirectUri,
+    };
+
+    // Initialize the Okta auth client with the config options
+    const authClient = new OktaAuth(oktaConfig);
+
+    // Perform Okta authentication using redirect
+    authClient.signInWithRedirect({
+        originalUri: redirectUri,
+        ...oktaConfig
+    });
+} else {
+    // The authCode exists, indicating that the user has returned from the redirect
+    Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
+        // Retrieve and set nonce from session storage if available
+        let sOktaTransactionStorage = window.sessionStorage.getItem('okta-transaction-storage');
         if (sOktaTransactionStorage) {
             try {
                 const oStorage = JSON.parse(sOktaTransactionStorage);
@@ -65,16 +69,15 @@ Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
                     console.log('nonce: ' + sNonce);
                 }
             } catch (error) {
-                console.error("Error parsing sessionStorage:", error);
+                console.error('Error parsing sessionStorage:', error);
             }
         }
-    }
 
         // Register AuthProvider commands and subscriptions
         AuthProvider.registerCommand('getAuthCode', (e) => {
             e.resolve({
                 authCode: authCode,
-                redirectUri: redirectURI,
+                redirectUri: redirectUri,
                 nonce: sNonce,
                 maxAge: 86400
             });
@@ -90,29 +93,28 @@ Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
             console.log(res);
         });
 
-	AuthProvider.registerCommand('reAuthenticate', (e) => {
-			e.resolve();
-	});
-	
-	AuthProvider.subscribe('Auth.error', (error) => {
-		console.log("Auth Error", error);
-		});
+        AuthProvider.registerCommand('reAuthenticate', (e) => {
+            e.resolve();
+        });
 
-	AuthProvider.subscribe('Auth.authError', (error) => {
-		console.log("Auth Error", error);
-		});
+        AuthProvider.subscribe('Auth.error', (error) => {
+            console.log('Auth Error', error);
+        });
 
-    const AuthLogoutBtn = document.getElementById('logout');
-    AuthLogoutBtn.onclick = function () {
-        AuthProvider.command('Auth.logout')
-            .finally(() => {
-                if (authClient) authClient.signOut();
-            });
-    };
+        AuthProvider.subscribe('Auth.authError', (error) => {
+            console.log('Auth Error', error);
+        });
+
+        const AuthLogoutBtn = document.getElementById('logout');
+        AuthLogoutBtn.onclick = function () {
+            AuthProvider.command('Auth.logout')
+                .finally(() => {
+                    if (authClient) authClient.signOut();
+                });
+        });
 
         AuthProvider.ready();
-	
-});
-
+    });
+}
 </script>                                
 </html>
